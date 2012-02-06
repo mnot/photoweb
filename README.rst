@@ -10,7 +10,7 @@ templates. What's different about it?
   standard embedded metadata
 * It's easy to modify the templates to make your photos look great.
 
-See <http://www.mnot.net/photos/> for an example.
+See <http://www.mnot.net/photo/> for an example.
 
 
 Installing Photoweb
