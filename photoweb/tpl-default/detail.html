@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{page_title}}</title>
+  <link rel="stylesheet" href="/photo/lib/style.css" type="text/css">
+  {{#next_img}}<link rel="prefetch" href="{{next_img}}">{{/next_img}}
+  <script src="/lib/jquery-1.6.min.js"></script>
+  <script src="/lib/jquery.touchSwipe-1.2.4.js"></script>
+  <script src="/photo/lib/script.js"></script>
+</head>
+<body>
+  <div class='info'>
+    <h1>{{page_title}}</h1>
+    <div class='nav'>
+      <a href="index.html" id="up">index</a>
+      {{#prev}}<a href="{{prev}}" id="prev">previous</a>{{/prev}}
+      {{#next}}<a href="{{next}}" id="next">next</a>{{/next}}
+      <a href="/photo/">home</a>
+    </div>
+    <div class='picmd'>
+      {{#title}}<h2>{{title}}</h2>{{/title}}
+      {{#caption}}<p class="caption">{{caption}}</p>{{/caption}}
+    </div>
+  </div>
+  <div class="wrap">
+      <div class='pic' style="width: {{w}}px">
+        <img src='{{img_path}}' width='{{w}}' height='{{h}}' id="pic">
+        <p class="num">{{num}}</p>
+        <p class="date">{{date}}</p>
+      </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{page_title}}</title>
+  <link rel="stylesheet" href="/photo/lib/style.css" type="text/css">
+</head>
+<body>
+  <div class='info'>
+      <h1>{{page_title}}</h1>
+      {{#page_desc}}
+        <p class="caption">{{p}}</p>
+      {{/page_desc}}
+  </div>
+  <table>
+  {{#pic_rows}}
+  <tr>
+  {{#pics}}
+  <td>
+  <div class='pic' styles="width: {{w}}px" id="{{num}}">
+    <a href="{{detail_path}}">
+        <img src='thumbnails/{{img_path}}' swidth='{{w}}' sheight='{{h}}'>
+    </a>
+    <p class="small num">{{num}}</p>
+    {{#title}}<h3>{{title}}</h3>{{/title}}
+  </div>
+  </td>
+  {{/pics}}
+  </tr>
+  {{/pic_rows}}
+  </table>
+  <p class="navigation">
+  	<a href="/personal/">about</a>
+  	<a href="/blog/">blog</a>
+  	<a href="/photo/">photos</a>
+  	<a href="/" class='hilite'>home</a> 
+  </p>
+</body>
+</html>
