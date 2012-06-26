@@ -267,7 +267,6 @@ class PhotoWebber(object):
         for tag, value in iptc_info.items():
             decoded = PhotoWebber._iptc_tags.get(tag, "unknown")
             out["Iptc." + decoded] = value
-        print out
         return out
 
     @staticmethod
