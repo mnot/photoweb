@@ -33,11 +33,10 @@ import os
 import shutil
 import sys
 
-import Image
-import pyexiv2
+from PIL import Image, ExifTags, IptcImagePlugin
 import pystache
 
-__version__ = '0.2'
+__version__ = '0.3'
 
 
 
@@ -230,35 +229,44 @@ class PhotoWebber(object):
             phile = os.path.join(photo_dir, phile)
             if os.path.splitext(phile)[1].lower() not in self.pic_types:
                 continue
-            try:
-                md_i = pyexiv2.ImageMetadata(phile)
-                md_i.read()
-            except IOError, why:
-                sys.stderr.write("Can't find metadata for %s (%s).\n" %
-                    (phile, why)
-                )
-                continue
-            def mdget(key, default=''):
-                "Get metadata for key."
-                try:
-                    val = md_i[key]
-                    if val.__class__ == pyexiv2.iptc.IptcTag:
-                        return unicode(str(val.value[0]), self.enc)
-                    else:
-                        return unicode(str(val.value), self.enc)
-                except (KeyError, AttributeError):
-                    return default
+            md = self.mdget(phile)
+            if md is None:
+                return
             path = os.path.split(phile)[1]
             pics.append({
                 'img_path': path,
                 'detail_path': "%s.html" % os.path.splitext(path)[0],
-                'title': mdget('Iptc.Application2.ObjectName'),
-                'caption': mdget('Iptc.Application2.Caption'),
-                'date': mdget('Exif.Photo.DateTimeOriginal'),
-                'w': mdget('Exif.Photo.PixelXDimension'),
-                'h': mdget('Exif.Photo.PixelYDimension'),
+                'title': md.get('Iptc.ObjectName', ''),
+                'caption': md.get('Iptc.Caption', ''),
+                'date': md.get('Exif.DateTimeOriginal', ''),
+                'w': md.get('Exif.PixelXDimension', ''),
+                'h': md.get('Exif.PixelYDimension', ''),
             })
         return pics
+
+    _iptc_tags = {
+        (2,5): "ObjectName",
+        (2,120): "Caption",
+    }
+    @staticmethod
+    def mdget(phile):
+        out = {}
+        try:
+            im = Image.open(phile)
+        except IOError, why:
+            sys.stderr.write("Can't find metadata for %s (%s).\n" %
+                (phile, why)
+            )
+            return None
+        exif_info = im._getexif()
+        for tag, value in exif_info.items():
+            decoded = ExifTags.TAGS.get(tag, "unknown")
+            out["exif." + decoded] = value
+        iptc_info = IptcImagePlugin.getiptcinfo(im) or {}
+        for tag, value in iptc_info.items():
+            decoded = _iptc_tags.get(tag, "unknown")
+            out["iptc." + decoded] = value
+        return out
 
     @staticmethod
     def error(msg):

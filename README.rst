@@ -19,7 +19,7 @@ Installing Photoweb
 Photoweb needs:
 
 1. Python 2.6 or greater; see <http://python.org/>
-2. The PIL, pyexiv2 and pystache libraries.
+2. The PIL and pystache libraries.
 
 It's easiest with PIP:
 

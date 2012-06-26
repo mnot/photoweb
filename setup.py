@@ -18,7 +18,6 @@ setup(
   package_data={'photoweb': ['tpl-default/*']},
   install_requires = [
     "PIL",
-    "pyexiv2",
     "pystache"
   ],
   long_description=open("README.rst").read(),
