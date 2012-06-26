@@ -57,6 +57,11 @@ class PhotoWebber(object):
     # encoding
     enc = 'utf-8'
 
+    _iptc_tags = {
+        (2,5): "ObjectName",
+        (2,120): "Caption",
+    }
+
     def __init__(self, options):
         self.options = options
         self.tpl, self.tpl_md = self.load_tpl()
@@ -239,18 +244,13 @@ class PhotoWebber(object):
                 'title': md.get('Iptc.ObjectName', ''),
                 'caption': md.get('Iptc.Caption', ''),
                 'date': md.get('Exif.DateTimeOriginal', ''),
-                'w': md.get('Exif.PixelXDimension', ''),
-                'h': md.get('Exif.PixelYDimension', ''),
+                'w': md.get('Exif.ExifImageWidth', ''),
+                'h': md.get('Exif.ExifImageHeight', ''),
             })
         return pics
 
-    _iptc_tags = {
-        (2,5): "ObjectName",
-        (2,120): "Caption",
-    }
     @staticmethod
     def mdget(phile):
-        out = {}
         try:
             im = Image.open(phile)
         except IOError, why:
@@ -258,14 +258,16 @@ class PhotoWebber(object):
                 (phile, why)
             )
             return None
-        exif_info = im._getexif()
+        out = {}
+        exif_info = im._getexif() or {}
         for tag, value in exif_info.items():
             decoded = ExifTags.TAGS.get(tag, "unknown")
-            out["exif." + decoded] = value
+            out["Exif." + decoded] = value
         iptc_info = IptcImagePlugin.getiptcinfo(im) or {}
         for tag, value in iptc_info.items():
-            decoded = _iptc_tags.get(tag, "unknown")
-            out["iptc." + decoded] = value
+            decoded = PhotoWebber._iptc_tags.get(tag, "unknown")
+            out["Iptc." + decoded] = value
+        print out
         return out
 
     @staticmethod
