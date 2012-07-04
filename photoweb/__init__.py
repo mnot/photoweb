@@ -234,7 +234,7 @@ class PhotoWebber(object):
             phile = os.path.join(photo_dir, phile)
             if os.path.splitext(phile)[1].lower() not in self.pic_types:
                 continue
-            md = self.mdget(phile)
+            md, (width, height) = self.mdget(phile)
             if md is None:
                 return
             path = os.path.split(phile)[1]
@@ -244,8 +244,8 @@ class PhotoWebber(object):
                 'title': md.get('Iptc.ObjectName', ''),
                 'caption': md.get('Iptc.Caption', ''),
                 'date': md.get('Exif.DateTimeOriginal', ''),
-                'w': md.get('Exif.ExifImageWidth', ''),
-                'h': md.get('Exif.ExifImageHeight', ''),
+                'w': md.get('Exif.ExifImageWidth', width),
+                'h': md.get('Exif.ExifImageHeight', height),
             })
         return pics
 
@@ -267,7 +267,7 @@ class PhotoWebber(object):
         for tag, value in iptc_info.items():
             decoded = PhotoWebber._iptc_tags.get(tag, "unknown")
             out["Iptc." + decoded] = value
-        return out
+        return out, im.size
 
     @staticmethod
     def error(msg):
