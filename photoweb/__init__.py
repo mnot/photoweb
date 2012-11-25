@@ -241,8 +241,8 @@ class PhotoWebber(object):
             pics.append({
                 'img_path': path,
                 'detail_path': "%s.html" % os.path.splitext(path)[0],
-                'title': md.get('Iptc.ObjectName', ''),
-                'caption': md.get('Iptc.Caption', ''),
+                'title': md.get('Iptc.ObjectName', '').decode('utf-8'),
+                'caption': md.get('Iptc.Caption', '').decode('utf-8'),
                 'date': md.get('Exif.DateTimeOriginal', ''),
                 'w': md.get('Exif.ExifImageWidth', width),
                 'h': md.get('Exif.ExifImageHeight', height),
