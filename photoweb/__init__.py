@@ -132,6 +132,8 @@ class PhotoWebber(object):
             md_j['page_desc'] = [
               {'p': d.decode(self.enc)} for d in self.options.page_desc
             ]
+        if self.options.reverse:
+            md_j['reverse'] = True
         return md_j
 
     def run(self, photo_dir):
@@ -140,8 +142,8 @@ class PhotoWebber(object):
             self.error("Can't find %s" % photo_dir)
         sys.stdout.write("Running %s\n" % photo_dir)
 
-        pics, page_vars = self.get_sorted_pics(photo_dir)
         md_j = self.read_md(photo_dir)
+        pics, page_vars = self.get_sorted_pics(photo_dir, md_j)
         page_vars.update(md_j)
         self.create_columns(pics, page_vars)
 
@@ -210,10 +212,12 @@ class PhotoWebber(object):
         image.thumbnail((width, height), Image.ANTIALIAS)
         image.save(thumb_path, "JPEG")
 
-    def get_sorted_pics(self, photo_dir):
+    def get_sorted_pics(self, photo_dir, md):
         "Get the pics and sort them"
         pics = self.load_pics(photo_dir)
         pics.sort(self.sort_pics)
+        if md.get('reverse', False): 
+            pics.reverse()
         for i in range(len(pics)):
             pics[i]['num'] = i + 1
         page_vars = {
@@ -308,6 +312,12 @@ def photoweb_cli():
         action="store_true",
         dest="html",
         help="Only generate HTML (not thumbnails)"
+    )
+    option_parser.add_option(
+        "-r",
+        action="store_true",
+        dest="reverse",
+        help="Reverse the order of the photos"
     )
     (options, args) = option_parser.parse_args()
     if len(args) < 1:
