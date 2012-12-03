@@ -143,7 +143,15 @@ class PhotoWebber(object):
         sys.stdout.write("Running %s\n" % photo_dir)
 
         md_j = self.read_md(photo_dir)
-        pics, page_vars = self.get_sorted_pics(photo_dir, md_j)
+        page_vars = self.get_sorted_pics(photo_dir, md_j)
+        pics = page_vars['pics']
+
+        # make the thumbnails
+        if self.tpl_md.get('thumbnails', False):
+            for pic in pics:
+                (pic['th_w'], pic['th_h']) = \
+                  self.make_thumbnail(photo_dir, pic)
+
         page_vars.update(md_j)
         self.create_columns(pics, page_vars)
 
@@ -157,11 +165,6 @@ class PhotoWebber(object):
             self.error("Can't write gallery: %s" % why)
         finally:
             gal_fd.close()
-
-        # make the thumbnails
-        if self.tpl_md.get('thumbnails', False) and not self.options.html:
-            for pic in pics:
-                self.make_thumbnail(photo_dir, pic)
 
         # write detail pages
         if self.tpl.get('detail', False):
@@ -211,6 +214,7 @@ class PhotoWebber(object):
         height = self.tpl_md.get('thumbnail_h', 250)
         image.thumbnail((width, height), Image.ANTIALIAS)
         image.save(thumb_path, "JPEG")
+        return image.size
 
     def get_sorted_pics(self, photo_dir, md):
         "Get the pics and sort them"
@@ -223,7 +227,7 @@ class PhotoWebber(object):
         page_vars = {
             'pics': pics,
         }
-        return pics, page_vars
+        return page_vars
         
     @staticmethod
     def sort_pics(pic_a, pic_b):
@@ -306,12 +310,6 @@ def photoweb_cli():
         action="append",
         dest="page_desc",
         help="Set the page's description"
-    )
-    option_parser.add_option(
-        "--html",
-        action="store_true",
-        dest="html",
-        help="Only generate HTML (not thumbnails)"
     )
     option_parser.add_option(
         "-r",
