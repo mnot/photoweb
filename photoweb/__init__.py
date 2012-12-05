@@ -145,6 +145,7 @@ class PhotoWebber(object):
         md_j = self.read_md(photo_dir)
         page_vars = self.get_sorted_pics(photo_dir, md_j)
         pics = page_vars['pics']
+        # TODO: error if no pics found.
 
         # make the thumbnails
         if self.tpl_md.get('thumbnails', False):
