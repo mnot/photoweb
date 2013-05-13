@@ -21,12 +21,16 @@ setup(
     "pystache"
   ],
   long_description=open("README.rst").read(),
+  license = "MIT",
   classifiers = [
     'Development Status :: 4 - Beta',
     'Intended Audience :: Other Audience',
     'License :: OSI Approved :: MIT License',
     'Environment :: Console',
     'Programming Language :: Python',
+    'Programming Language :: Python :: 2',
+    'Programming Language :: Python :: 2.6',
+    'Programming Language :: Python :: 2.7',
     'Operating System :: POSIX',
     'Topic :: Text Processing :: Markup :: HTML',
     'Topic :: Multimedia :: Graphics :: Presentation',
