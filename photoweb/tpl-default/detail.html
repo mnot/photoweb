@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Melbourne</title>
+  <title>{{page_title}}</title>
   <link rel="stylesheet" href="/photo/lib/style.css" type="text/css">
-  <link rel="prefetch" href="IMG_0148.jpg">
-  <meta name="viewport" content="width=1024,user-scalable=no" />
+  {{#next_img}}<link rel="prefetch" href="{{next_img}}">{{/next_img}}
+  <meta name="viewport" content="width={{w}},user-scalable=no" />
   <script src="/lib/components/jquery/jquery.min.js"></script>
   <script src="/lib/components/jquery-touchswipe/jquery.touchSwipe.min.js"></script>
   <script src="/photo/lib/script.js"></script>
 </head>
 <body>
   <div class='info'>
-    <h1>Melbourne</h1>
+    <h1>{{page_title}}</h1>
     <div class='nav'>
       <a href="index.html" id="up">index</a>
-      <a href="IMG_0127.html" id="prev">previous</a>
-      <a href="IMG_0148.html" id="next">next</a>
+      {{#prev}}<a href="{{prev}}" id="prev">previous</a>{{/prev}}
+      {{#next}}<a href="{{next}}" id="next">next</a>{{/next}}
       <a href="/photo/">home</a>
     </div>
     <div class='picmd'>
-      
-      
+      {{#title}}<h2>{{title}}</h2>{{/title}}
+      {{#caption}}<p class="caption">{{caption}}</p>{{/caption}}
     </div>
   </div>
   <div class="wrap">
-      <div class='pic' style="width: 1024px">
-        <img src='IMG_0136.jpg' width='1024' height='768' id="pic">
-        <p class="num">16</p>
-        <p class="date">2005:01:20 22:05:46</p>
+      <div class='pic' style="width: {{w}}px">
+        <img src='{{img_path}}' width='{{w}}' height='{{h}}' id="pic">
+        <p class="num">{{num}}</p>
+        <p class="date">{{date}}</p>
       </div>
   </div>
 </body>
