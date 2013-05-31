@@ -39,7 +39,6 @@ import pystache
 __version__ = '0.4.1'
 
 
-
 class PhotoWebber(object):
     """
     Takes photo directories and creates HTML.
@@ -82,12 +81,12 @@ class PhotoWebber(object):
         if not os.path.exists(gallery_path):
             self.error("Can't find gallery.html in %s template." % tpl_name)
         try:
-            tpl['gallery'] = open(gallery_path).read()
+            tpl['gallery'] = open(gallery_path).read().decode(self.enc)
         except IOError, why:
             self.error("Problem loading gallery template: %s" % why)
         if os.path.exists(detail_path):
             try:
-                tpl['detail'] = open(detail_path).read()
+                tpl['detail'] = open(detail_path).read().decode(self.enc)
             except IOError, why:
                 self.error("Problem loading detail template: %s" % why)
         if os.path.exists(tpl_md_path):
