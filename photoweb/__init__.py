@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import json
+import os
 import shutil
 import sys
 
@@ -10,7 +11,7 @@ import pystache
 __version__ = "0.4.1"
 
 
-class PhotoWebber(object):
+class PhotoWebber:
     """
     Takes photo directories and creates HTML.
     """
