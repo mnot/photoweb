@@ -22,6 +22,9 @@ class PhotoWebber:
     # Where to look for templates
     tpl_dir = os.path.expanduser("~/.photoweb/tpl")
 
+    # Bundled templates
+    pkg_tpl_dir = os.path.join(os.path.dirname(__file__), "templates")
+
     # The directory to store thumbnails in
     thumb_dirname = "thumbnails"
 
@@ -48,9 +51,16 @@ class PhotoWebber:
         tpl_name = self.options.template
         tpl: TemplateData = {}
         tpl_md: TemplateMetadata = {}
-        if not os.path.isdir(self.tpl_dir):
-            self.create_default_tpl()
-        tpl_path = os.path.join(self.tpl_dir, tpl_name)
+
+        if tpl_name == "default":
+            # first check for a user-specified default
+            tpl_path = os.path.join(self.tpl_dir, tpl_name)
+            if not os.path.isdir(tpl_path):
+                # use the package default
+                tpl_path = self.pkg_tpl_dir
+        else:
+            tpl_path = os.path.join(self.tpl_dir, tpl_name)
+
         if not os.path.isdir(tpl_path):
             self.error(f"Can't find {tpl_name} template.")
         gallery_path = os.path.join(tpl_path, "gallery.html")
@@ -79,8 +89,12 @@ class PhotoWebber:
 
     def create_default_tpl(self) -> None:
         "Create the default templates."
-        default_tpl = os.path.join(os.path.dirname(__file__), "tpl-default")
-        shutil.copytree(default_tpl, os.path.join(self.tpl_dir, "default"))
+        dest_dir = os.path.join(self.tpl_dir, "default")
+        if os.path.isdir(dest_dir):
+            sys.stdout.write("Default templates already exist.\n")
+            return
+        shutil.copytree(self.pkg_tpl_dir, dest_dir)
+        sys.stdout.write(f"Default templates copied to {dest_dir}\n")
 
     def write_md(self, photo_dir: str, md_j: GalleryMetadata) -> None:
         "Write the gallery metadata."

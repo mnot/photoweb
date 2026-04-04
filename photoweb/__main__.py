@@ -30,14 +30,24 @@ def photoweb_cli() -> None:
         dest="reverse",
         help="Reverse the order of the photos",
     )
+    option_parser.add_option(
+        "-c",
+        "--copy-templates",
+        action="store_true",
+        dest="copy_templates",
+        help="Copy the default templates to ~/.photoweb/tpl/default",
+    )
     options, args = option_parser.parse_args()
-    if len(args) < 1:
+    if len(args) < 1 and not options.copy_templates:
         option_parser.error("Please specify at least one directory.")
 
     try:
         photoweb = PhotoWebber(options)
-        thisdir = os.getcwd()
-        for photodir in args:
-            photoweb.run(os.path.join(thisdir, photodir))
+        if options.copy_templates:
+            photoweb.create_default_tpl()
+        else:
+            thisdir = os.getcwd()
+            for photodir in args:
+                photoweb.run(os.path.join(thisdir, photodir))
     except KeyboardInterrupt:
         photoweb.error("Interrupted.")
