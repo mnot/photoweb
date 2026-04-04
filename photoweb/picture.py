@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from typing import Optional, Tuple, Dict, Any
 
 from PIL import Image, ExifTags, IptcImagePlugin
@@ -30,14 +31,22 @@ class Picture:
         try:
             with Image.open(self.photo_path) as im:
                 out: Dict[str, Any] = {}
-                exif_info: Any = im.getexif() or {}
-                for tag, value in exif_info.items():
+                exif_obj = im.getexif()
+                # main EXIF tags (IFD0)
+                for tag, value in exif_obj.items():
                     decoded = ExifTags.TAGS.get(tag, "unknown")
                     out["Exif." + decoded] = value
+
+                # standard EXIF SubIFD (often contains DateTimeOriginal)
+                sub_ifd = exif_obj.get_ifd(ExifTags.Base.ExifOffset)
+                for sub_tag, sub_value in sub_ifd.items():
+                    decoded = ExifTags.TAGS.get(sub_tag, "unknown")
+                    out["Exif." + decoded] = sub_value
+
                 iptc_info = IptcImagePlugin.getiptcinfo(im) or {}
-                for tag, value in iptc_info.items():
-                    decoded = self.IPTC_TAGS.get(tag, "unknown")
-                    out["Iptc." + decoded] = value
+                for iptc_tag, iptc_value in iptc_info.items():
+                    decoded = self.IPTC_TAGS.get(iptc_tag, "unknown")
+                    out["Iptc." + decoded] = iptc_value
                 return out, im.size
         except IOError:
             return None, (0, 0)
@@ -47,12 +56,19 @@ class Picture:
         if self.md is None:
             return {}
 
+        date_str = self.md.get("Exif.DateTimeOriginal", "")
+        try:
+            date_obj = datetime.strptime(date_str, "%Y:%m:%d %H:%M:%S")
+            formatted_date = date_obj.strftime("%-d %b %Y")
+        except (ValueError, TypeError):
+            formatted_date = date_str
+
         self.data = {
             "img_path": self.filename,
             "detail_path": f"{os.path.splitext(self.filename)[0]}.html",
             "title": self.md.get("Iptc.ObjectName", b"").decode("utf-8"),
             "caption": self.md.get("Iptc.Caption", b"").decode("utf-8"),
-            "date": self.md.get("Exif.DateTimeOriginal", "0000:00:00 00:00:00"),
+            "date": formatted_date,
             "w": self.md.get("Exif.ExifImageWidth", self.width),
             "h": self.md.get("Exif.ExifImageHeight", self.height),
         }
