@@ -3,13 +3,13 @@
 from optparse import OptionParser
 import os
 
-from . import PhotoWebber
+from . import PhotoWebber, __version__
 
 
 def photoweb_cli():
     "Run command-line photoweb."
     usage = "Usage: %prog [options] <dir>"
-    version = "photoweb version %s" % __version__
+    version = f"photoweb version {__version__}"
     option_parser = OptionParser(usage=usage, version=version)
     option_parser.set_defaults(
         template="default",

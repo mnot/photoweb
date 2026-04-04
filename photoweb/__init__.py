@@ -28,7 +28,7 @@ class PhotoWebber:
     # encoding
     enc = "utf-8"
 
-    _iptc_tags = {
+    IPTC_TAGS = {
         (2, 5): "ObjectName",
         (2, 120): "Caption",
     }
@@ -46,29 +46,29 @@ class PhotoWebber:
             self.create_default_tpl()
         tpl_path = os.path.join(self.tpl_dir, tpl_name)
         if not os.path.isdir(tpl_path):
-            self.error("Can't find %s template." % tpl_name)
+            self.error(f"Can't find {tpl_name} template.")
         gallery_path = os.path.join(tpl_path, "gallery.html")
         detail_path = os.path.join(tpl_path, "detail.html")
         tpl_md_path = os.path.join(tpl_path, "md.json")
         if not os.path.exists(gallery_path):
-            self.error("Can't find gallery.html in %s template." % tpl_name)
+            self.error(f"Can't find gallery.html in {tpl_name} template.")
         try:
-            tpl["gallery"] = open(gallery_path).read().decode(self.enc)
+            with open(gallery_path, "r", encoding=self.enc) as file_handle:
+                tpl["gallery"] = file_handle.read()
         except IOError as why:
-            self.error("Problem loading gallery template: %s" % why)
+            self.error(f"Problem loading gallery template: {why}")
         if os.path.exists(detail_path):
             try:
-                tpl["detail"] = open(detail_path).read().decode(self.enc)
+                with open(detail_path, "r", encoding=self.enc) as file_handle:
+                    tpl["detail"] = file_handle.read()
             except IOError as why:
-                self.error("Problem loading detail template: %s" % why)
+                self.error(f"Problem loading detail template: {why}")
         if os.path.exists(tpl_md_path):
             try:
-                tpl_md_fd = open(tpl_md_path, "r")
-                tpl_md = json.load(tpl_md_fd)
+                with open(tpl_md_path, "r", encoding=self.enc) as tpl_md_fd:
+                    tpl_md = json.load(tpl_md_fd)
             except (IOError, ValueError) as why:
-                self.error("Problem loading template metadata: %s" % why)
-            finally:
-                tpl_md_fd.close()
+                self.error(f"Problem loading template metadata: {why}")
         return tpl, tpl_md
 
     def create_default_tpl(self):
@@ -80,20 +80,17 @@ class PhotoWebber:
         "Write the gallery metadata."
         md_file = os.path.join(photo_dir, "md.json")
         try:
-            md_fd = open(md_file, "w")
-            json.dump(md_j, md_fd)
+            with open(md_file, "w", encoding=self.enc) as md_fd:
+                json.dump(md_j, md_fd)
         except IOError as why:
-            self.error("Couldn't write metatadata: %s" % why)
-        finally:
-            md_fd.close()
+            self.error(f"Couldn't write metatadata: {why}")
 
     def read_md(self, photo_dir):
         "Read the gallery metadata."
         md_file = os.path.join(photo_dir, "md.json")
         try:
-            md_fd = open(md_file, "r")
-            md_j = json.load(md_fd)
-            md_fd.close()
+            with open(md_file, "r", encoding=self.enc) as md_fd:
+                md_j = json.load(md_fd)
         except (IOError, ValueError):
             md_j = {}
         # update with command-line options, if any
@@ -110,8 +107,8 @@ class PhotoWebber:
     def run(self, photo_dir):
         "Process the photos in photo_dir."
         if not os.path.isdir(photo_dir):
-            self.error("Can't find %s" % photo_dir)
-        sys.stdout.write("Running %s\n" % photo_dir)
+            self.error(f"Can't find {photo_dir}")
+        sys.stdout.write(f"Running {photo_dir}\n")
 
         md_j = self.read_md(photo_dir)
         page_vars = self.get_sorted_pics(photo_dir, md_j)
@@ -130,12 +127,10 @@ class PhotoWebber:
         gallery_html = pystache.render(self.tpl["gallery"], page_vars)
         gallery_html_path = os.path.join(photo_dir, "index.html")
         try:
-            gal_fd = open(gallery_html_path, "w")
-            gal_fd.write(gallery_html.encode(self.enc))
+            with open(gallery_html_path, "w", encoding=self.enc) as gal_fd:
+                gal_fd.write(gallery_html)
         except IOError as why:
-            self.error("Can't write gallery: %s" % why)
-        finally:
-            gal_fd.close()
+            self.error(f"Can't write gallery: {why}")
 
         # write detail pages
         if self.tpl.get("detail", False):
@@ -150,12 +145,10 @@ class PhotoWebber:
                 detail_html = pystache.render(self.tpl["detail"], pic)
                 detail_html_path = os.path.join(photo_dir, pic["detail_path"])
                 try:
-                    detail_fd = open(detail_html_path, "w")
-                    detail_fd.write(detail_html.encode(self.enc))
+                    with open(detail_html_path, "w", encoding=self.enc) as detail_fd:
+                        detail_fd.write(detail_html)
                 except IOError as why:
-                    self.error("Can't write detail page: %s" % why)
-                finally:
-                    detail_fd.close()
+                    self.error(f"Can't write detail page: {why}")
 
         self.write_md(photo_dir, md_j)
 
@@ -183,18 +176,18 @@ class PhotoWebber:
         image = Image.open(img_path)
         width = self.tpl_md.get("thumbnail_w", 250)
         height = self.tpl_md.get("thumbnail_h", 250)
-        image.thumbnail((width, height), Image.ANTIALIAS)
+        image.thumbnail((width, height), Image.Resampling.LANCZOS)
         image.save(thumb_path, "JPEG")
         return image.size
 
     def get_sorted_pics(self, photo_dir, md):
         "Get the pics and sort them"
         pics = self.load_pics(photo_dir)
-        pics.sort(self.sort_pics)
+        pics.sort(key=lambda x: x["date"])
         if md.get("reverse", False):
             pics.reverse()
-        for i in range(len(pics)):
-            pics[i]["num"] = i + 1
+        for i, pic in enumerate(pics):
+            pic["num"] = i + 1
         page_vars = {
             "pics": pics,
         }
@@ -203,7 +196,7 @@ class PhotoWebber:
     @staticmethod
     def sort_pics(pic_a, pic_b):
         "Sort function for pictures, by date."
-        return cmp(pic_a["date"], pic_b["date"])
+        return (pic_a["date"] > pic_b["date"]) - (pic_a["date"] < pic_b["date"])
 
     def load_pics(self, photo_dir):
         "Find the pictures in photo_dir."
@@ -215,14 +208,14 @@ class PhotoWebber:
                 continue
             md, (width, height) = self.mdget(phile)
             if md is None:
-                return
+                return []
             path = os.path.split(phile)[1]
             pics.append(
                 {
                     "img_path": path,
-                    "detail_path": "%s.html" % os.path.splitext(path)[0],
-                    "title": md.get("Iptc.ObjectName", "").decode("utf-8"),
-                    "caption": md.get("Iptc.Caption", "").decode("utf-8"),
+                    "detail_path": f"{os.path.splitext(path)[0]}.html",
+                    "title": md.get("Iptc.ObjectName", b"").decode("utf-8"),
+                    "caption": md.get("Iptc.Caption", b"").decode("utf-8"),
                     "date": md.get("Exif.DateTimeOriginal", ""),
                     "w": md.get("Exif.ExifImageWidth", width),
                     "h": md.get("Exif.ExifImageHeight", height),
@@ -235,21 +228,21 @@ class PhotoWebber:
         try:
             im = Image.open(phile)
         except IOError as why:
-            sys.stderr.write("Can't find metadata for %s (%s).\n" % (phile, why))
+            sys.stderr.write(f"Can't find metadata for {phile} ({why}).\n")
             return None
         out = {}
-        exif_info = im._getexif() or {}
+        exif_info = im.getexif() or {}
         for tag, value in exif_info.items():
             decoded = ExifTags.TAGS.get(tag, "unknown")
             out["Exif." + decoded] = value
         iptc_info = IptcImagePlugin.getiptcinfo(im) or {}
         for tag, value in iptc_info.items():
-            decoded = PhotoWebber._iptc_tags.get(tag, "unknown")
+            decoded = PhotoWebber.IPTC_TAGS.get(tag, "unknown")
             out["Iptc." + decoded] = value
         return out, im.size
 
     @staticmethod
     def error(msg):
         "Something has gone horribly wrong."
-        sys.stderr.write("FATAL: %s\n" % msg)
+        sys.stderr.write(f"FATAL: {msg}\n")
         sys.exit(1)
