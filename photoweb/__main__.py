@@ -2,8 +2,9 @@
 
 from optparse import OptionParser
 import os
+import sys
 
-from . import PhotoWebber, __version__
+from . import PhotoWebber, __version__, PhotoWebError
 
 
 def photoweb_cli() -> None:
@@ -49,5 +50,9 @@ def photoweb_cli() -> None:
             thisdir = os.getcwd()
             for photodir in args:
                 photoweb.run(os.path.join(thisdir, photodir))
+    except PhotoWebError as why:
+        sys.stderr.write(f"FATAL: {why}\n")
+        sys.exit(1)
     except KeyboardInterrupt:
-        photoweb.error("Interrupted.")
+        sys.stderr.write("Interrupted.\n")
+        sys.exit(1)
