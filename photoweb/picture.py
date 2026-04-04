@@ -18,6 +18,7 @@ class Picture:
     # IPTC tags to decode
     IPTC_TAGS = {
         (2, 5): "ObjectName",
+        (2, 105): "Headline",
         (2, 120): "Caption",
     }
 
@@ -47,9 +48,40 @@ class Picture:
                 for iptc_tag, iptc_value in iptc_info.items():
                     decoded = self.IPTC_TAGS.get(iptc_tag, "unknown")
                     out["Iptc." + decoded] = iptc_value
+
+                # XMP metadata (often contains dc:title)
+                try:
+                    xmp_info = im.getxmp()
+                    for xmp_k, xmp_v in xmp_info.items():
+                        out["Xmp." + str(xmp_k)] = xmp_v
+                except (AttributeError, ValueError, TypeError):
+                    # getxmp() may fail or not exist in some Pillow versions/configurations
+                    pass
+
                 return out, im.size
         except IOError:
             return None, (0, 0)
+
+    def _get_val(self, key: str) -> str:
+        "Get a string value from metadata, handling bytes, lists and dicts."
+        if self.md is None:
+            return ""
+        val = self.md.get(key, "")
+        if isinstance(val, (list, tuple)):
+            if not val:
+                return ""
+            val = val[0]
+        if isinstance(val, bytes):
+            return val.decode("utf-8").strip()
+        if isinstance(val, dict):
+            # handle XMP Alt containers
+            for xmp_val in val.values():
+                if isinstance(xmp_val, str):
+                    return xmp_val.strip()
+        result = str(val).strip()
+        if result == "unknown":
+            return ""
+        return result
 
     def process(self) -> PictureData:
         "Process metadata into common PictureData."
@@ -63,11 +95,30 @@ class Picture:
         except (ValueError, TypeError):
             formatted_date = date_str
 
+        # Get title with fallback
+        title = ""
+        title_sources = [
+            "Iptc.ObjectName",
+            "Iptc.Headline",
+            "Exif.XPTitle",
+            "Xmp.dc:title",
+        ]
+        for source in title_sources:
+            title = self._get_val(source)
+            if title:
+                break
+
+        if not title:
+            stem = os.path.splitext(self.filename)[0]
+            ignore_prefixes = ["IMG_", "DSC_", "_MG_", "P_"]
+            if not any(stem.upper().startswith(p) for p in ignore_prefixes):
+                title = stem
+
         self.data = {
             "img_path": self.filename,
             "detail_path": f"{os.path.splitext(self.filename)[0]}.html",
-            "title": self.md.get("Iptc.ObjectName", b"").decode("utf-8"),
-            "caption": self.md.get("Iptc.Caption", b"").decode("utf-8"),
+            "title": title.strip(),
+            "caption": self._get_val("Iptc.Caption"),
             "date": formatted_date,
             "w": self.md.get("Exif.ExifImageWidth", self.width),
             "h": self.md.get("Exif.ExifImageHeight", self.height),

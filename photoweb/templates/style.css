@@ -131,9 +131,9 @@ td {
   padding: 12px;
   font-size: 16px;
   font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.2;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 /* Detail Page */

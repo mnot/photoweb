@@ -15,7 +15,8 @@ classifiers = [
 ]
 dependencies = [
     "pillow",
-    "jinja2"
+    "jinja2",
+    "defusedxml"
 ]
 
 [project.optional-dependencies]
