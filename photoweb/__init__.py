@@ -53,18 +53,18 @@ class PhotoWebber(object):
             self.error("Can't find gallery.html in %s template." % tpl_name)
         try:
             tpl['gallery'] = open(gallery_path).read().decode(self.enc)
-        except IOError, why:
+        except IOError as why:
             self.error("Problem loading gallery template: %s" % why)
         if os.path.exists(detail_path):
             try:
                 tpl['detail'] = open(detail_path).read().decode(self.enc)
-            except IOError, why:
+            except IOError as why:
                 self.error("Problem loading detail template: %s" % why)
         if os.path.exists(tpl_md_path):
             try:
                 tpl_md_fd = open(tpl_md_path, 'r')
                 tpl_md = json.load(tpl_md_fd)
-            except (IOError, ValueError), why:
+            except (IOError, ValueError) as why:
                 self.error("Problem loading template metadata: %s" % why)
             finally:
                 tpl_md_fd.close()
@@ -81,7 +81,7 @@ class PhotoWebber(object):
         try:
             md_fd = open(md_file, 'w')
             json.dump(md_j, md_fd)
-        except IOError, why:
+        except IOError as why:
             self.error("Couldn't write metatadata: %s" % why)
         finally:
             md_fd.close()
@@ -132,7 +132,7 @@ class PhotoWebber(object):
         try:
             gal_fd = open(gallery_html_path, 'w')
             gal_fd.write(gallery_html.encode(self.enc))
-        except IOError, why:
+        except IOError as why:
             self.error("Can't write gallery: %s" % why)
         finally:
             gal_fd.close()
@@ -152,7 +152,7 @@ class PhotoWebber(object):
                 try:
                     detail_fd = open(detail_html_path, 'w')
                     detail_fd.write(detail_html.encode(self.enc))
-                except IOError, why:
+                except IOError as why:
                     self.error("Can't write detail page: %s" % why)
                 finally:
                     detail_fd.close()
@@ -232,7 +232,7 @@ class PhotoWebber(object):
     def mdget(phile):
         try:
             im = Image.open(phile)
-        except IOError, why:
+        except IOError as why:
             sys.stderr.write("Can't find metadata for %s (%s).\n" %
                 (phile, why)
             )
