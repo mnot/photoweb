@@ -163,8 +163,27 @@ a:hover {
 }
 
 .wrap .pic {
-  max-width: 100%;
+  max-width: 95vw;
   border-radius: 18px;
+  transition: var(--transition);
+  cursor: zoom-in;
+}
+
+.wrap .pic img {
+  max-height: 80vh;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  transition: var(--transition);
+}
+
+.wrap .pic.full {
+  cursor: zoom-out;
+}
+
+.wrap .pic.full img {
+  max-height: none;
+  width: 100%;
 }
 
 .wrap .num, .wrap .date {

@@ -36,3 +36,15 @@ document.addEventListener('keydown', function(event) {
         }
     }
 });
+
+/**
+ * Handle image zoom/toggle on click
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    const pic = document.getElementById('pic');
+    if (pic && pic.parentElement) {
+        pic.addEventListener('click', function() {
+            pic.parentElement.classList.toggle('full');
+        });
+    }
+});
