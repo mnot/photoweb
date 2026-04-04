@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from typing import Optional, Tuple, Dict, Any
 
-from PIL import Image, ExifTags, IptcImagePlugin
+from PIL import Image, ExifTags, IptcImagePlugin, ImageOps
 
 from .types import PictureData, TemplateMetadata
 
@@ -58,7 +58,10 @@ class Picture:
                     # getxmp() may fail or not exist in some Pillow versions/configurations
                     pass
 
-                return out, im.size
+                # Get dimensions after accounting for orientation
+                with ImageOps.exif_transpose(im) as oriented_im:
+                    size = oriented_im.size
+                return out, size
         except IOError:
             return None, (0, 0)
 
@@ -120,15 +123,16 @@ class Picture:
             "title": title.strip(),
             "caption": self._get_val("Iptc.Caption"),
             "date": formatted_date,
-            "w": self.md.get("Exif.ExifImageWidth", self.width),
-            "h": self.md.get("Exif.ExifImageHeight", self.height),
+            "w": self.width,
+            "h": self.height,
         }
         return self.data
 
     def make_thumbnail(self, thumb_dir: str, tpl_md: TemplateMetadata) -> Tuple[int, int]:
         "Make a thumbnail."
         thumb_path = os.path.join(thumb_dir, self.filename)
-        with Image.open(self.photo_path) as image:
+        with Image.open(self.photo_path) as im:
+            image = ImageOps.exif_transpose(im)
             width = tpl_md.get("thumbnail_w", 250)
             height = tpl_md.get("thumbnail_h", 250)
             image.thumbnail((width, height), Image.Resampling.LANCZOS)
