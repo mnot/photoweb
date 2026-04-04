@@ -1,27 +1,27 @@
 # Photoweb
 
-Photoweb creates HTML galleries based on in-photo metadata, from flexible
+Photoweb creates HTML galleries based on in-photo metadata, using flexible
 templates. What's different about it?
 
-* It's easy to add new photos; just drop them in the folder and re-run
+* It's easy to add new photos; just drop them in the folder and re-run.
 * You don't have to track metadata; it comes from the photos themselves, using
-  standard embedded metadata
+  standard embedded metadata (EXIF, IPTC, XMP).
+* It includes specialized support for titles and descriptions from Apple Photos.
 * It's easy to modify the templates to make your photos look great.
+* It supports modern web features like dark mode, keyboard navigation, and 
+  responsive side-by-side layouts out of the box.
 
 
-## Installing Photoweb
+## Installation
 
-Photoweb needs:
+Photoweb needs [Python](https://www.python.org/).
 
-1. Python 2.6 or greater; see <http://python.org/>
-2. The PIL and pystache libraries.
+It's easiest with [pipx](https://pipx.pypa.io/stable/):
 
-It's easiest with PIP:
-
-> pip install photoweb
+> pipx install photoweb
 
 
-## Using Photoweb
+## Usage
 
 To generate the HTML for a gallery, call it from the command line:
 
@@ -42,17 +42,29 @@ run photoweb.
 
 ## Creating and Using Templates
 
-By default, the default template will be used (from `~/.photoweb/tpl/default`; 
-if it isn't there, it'll be automagically created). You can edit this, or
+By default, the bundled default template will be used. You can edit this, or
 create new templates, using them with the -t option:
 
 > photoweb -t "my template" .
+
+To bootstrap your own template, you can copy the default one:
+
+> photoweb --copy-templates ./my-custom-design
 
 Templates are directories with the following files in them:
 
 * md.json - a configuration file
 * gallery.html - the overview page
 * detail.html - a single photo page
- 
+* style.css - visual styling
+* photoweb.js - interactive logic (for keyboard navigation and zoom)
+
 Take a look at the default template to get an idea of how to create your own.
 
+
+## Navigation and Shortcuts
+
+When viewing a photo in the generated gallery:
+* **Left/Right Arrow keys**: Previous/Next photo.
+* **Escape**: Return to the gallery index.
+* **Click/Tap**: Toggle between fit-to-screen and full-size view.
