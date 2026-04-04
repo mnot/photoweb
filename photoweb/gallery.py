@@ -66,6 +66,7 @@ class Gallery:
 
         for i, pic_data in enumerate(pics_data):
             pic_data["num"] = i + 1
+            pic_data["detail_path"] = f"{i + 1}.html"
 
         return pics_data
 

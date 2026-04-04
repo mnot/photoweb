@@ -17,7 +17,7 @@
   <div class="row">
   {% for pic in row.pics %}
   <div class="cell">
-  <div class='pic' id="{{pic.num}}">
+  <div class='pic' id="{{pic.num}}" style="width:{{pic.th_w}}px">
     <a href="{{pic.detail_path}}">
         <img src='thumbnails/{{pic.img_path}}' width='{{pic.th_w}}' height='{{pic.th_h}}'>
     </a>

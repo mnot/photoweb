@@ -71,6 +71,7 @@ a:hover {
   color: var(--secondary-text);
   max-width: 600px;
   margin: 0 auto;
+  overflow-wrap: break-word;
 }
 
 /* Gallery Grid */
@@ -101,7 +102,7 @@ a:hover {
   background-color: var(--card-bg);
   transition: var(--transition);
   width: fit-content;
-  width: -moz-fit-content;
+  max-width: 100%;
   margin: 0 auto;
 }
 
@@ -134,8 +135,6 @@ a:hover {
   font-size: 16px;
   font-weight: 500;
   line-height: 1.2;
-  overflow-wrap: break-word;
-  word-wrap: break-word;
 }
 
 /* Detail Page */
@@ -225,6 +224,8 @@ a:hover {
     margin-bottom: 24px;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 16px;
+    max-width: 100%;
+    overflow-wrap: break-word;
   }
 
   .detail-layout .nav {
@@ -239,6 +240,8 @@ a:hover {
   .detail-layout .picmd h2 {
     font-size: 24px;
     font-weight: 600;
+    max-width: 100%;
+    overflow-wrap: break-word;
   }
 
   .detail-layout .wrap {
