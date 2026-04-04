@@ -7,7 +7,7 @@ import sys
 from PIL import Image, ExifTags, IptcImagePlugin
 import pystache
 
-__version__ = '0.4.1'
+__version__ = "0.4.1"
 
 
 class PhotoWebber(object):
@@ -22,14 +22,14 @@ class PhotoWebber(object):
     thumb_dirname = "thumbnails"
 
     # File extensions that we consider pictures
-    pic_types = ['.jpg', '.jpeg']
+    pic_types = [".jpg", ".jpeg"]
 
     # encoding
-    enc = 'utf-8'
+    enc = "utf-8"
 
     _iptc_tags = {
-        (2,5): "ObjectName",
-        (2,120): "Caption",
+        (2, 5): "ObjectName",
+        (2, 120): "Caption",
     }
 
     def __init__(self, options):
@@ -52,17 +52,17 @@ class PhotoWebber(object):
         if not os.path.exists(gallery_path):
             self.error("Can't find gallery.html in %s template." % tpl_name)
         try:
-            tpl['gallery'] = open(gallery_path).read().decode(self.enc)
+            tpl["gallery"] = open(gallery_path).read().decode(self.enc)
         except IOError as why:
             self.error("Problem loading gallery template: %s" % why)
         if os.path.exists(detail_path):
             try:
-                tpl['detail'] = open(detail_path).read().decode(self.enc)
+                tpl["detail"] = open(detail_path).read().decode(self.enc)
             except IOError as why:
                 self.error("Problem loading detail template: %s" % why)
         if os.path.exists(tpl_md_path):
             try:
-                tpl_md_fd = open(tpl_md_path, 'r')
+                tpl_md_fd = open(tpl_md_path, "r")
                 tpl_md = json.load(tpl_md_fd)
             except (IOError, ValueError) as why:
                 self.error("Problem loading template metadata: %s" % why)
@@ -72,14 +72,14 @@ class PhotoWebber(object):
 
     def create_default_tpl(self):
         "Create the default templates."
-        default_tpl = os.path.join(os.path.dirname(__file__), 'tpl-default')
-        shutil.copytree(default_tpl, os.path.join(self.tpl_dir, 'default'))
+        default_tpl = os.path.join(os.path.dirname(__file__), "tpl-default")
+        shutil.copytree(default_tpl, os.path.join(self.tpl_dir, "default"))
 
     def write_md(self, photo_dir, md_j):
         "Write the gallery metadata."
-        md_file = os.path.join(photo_dir, 'md.json')
+        md_file = os.path.join(photo_dir, "md.json")
         try:
-            md_fd = open(md_file, 'w')
+            md_fd = open(md_file, "w")
             json.dump(md_j, md_fd)
         except IOError as why:
             self.error("Couldn't write metatadata: %s" % why)
@@ -88,22 +88,22 @@ class PhotoWebber(object):
 
     def read_md(self, photo_dir):
         "Read the gallery metadata."
-        md_file = os.path.join(photo_dir, 'md.json')
+        md_file = os.path.join(photo_dir, "md.json")
         try:
-            md_fd = open(md_file, 'r')
+            md_fd = open(md_file, "r")
             md_j = json.load(md_fd)
             md_fd.close()
         except (IOError, ValueError):
             md_j = {}
         # update with command-line options, if any
         if self.options.page_title:
-            md_j['page_title'] = self.options.page_title.decode(self.enc)
+            md_j["page_title"] = self.options.page_title.decode(self.enc)
         if self.options.page_desc:
-            md_j['page_desc'] = [
-              {'p': d.decode(self.enc)} for d in self.options.page_desc
+            md_j["page_desc"] = [
+                {"p": d.decode(self.enc)} for d in self.options.page_desc
             ]
         if self.options.reverse:
-            md_j['reverse'] = True
+            md_j["reverse"] = True
         return md_j
 
     def run(self, photo_dir):
@@ -114,23 +114,22 @@ class PhotoWebber(object):
 
         md_j = self.read_md(photo_dir)
         page_vars = self.get_sorted_pics(photo_dir, md_j)
-        pics = page_vars['pics']
+        pics = page_vars["pics"]
         # TODO: error if no pics found.
 
         # make the thumbnails
-        if self.tpl_md.get('thumbnails', False):
+        if self.tpl_md.get("thumbnails", False):
             for pic in pics:
-                (pic['th_w'], pic['th_h']) = \
-                  self.make_thumbnail(photo_dir, pic)
+                pic["th_w"], pic["th_h"] = self.make_thumbnail(photo_dir, pic)
 
         page_vars.update(md_j)
         self.create_columns(pics, page_vars)
 
         # write gallery HTML
-        gallery_html = pystache.render(self.tpl['gallery'], page_vars)
+        gallery_html = pystache.render(self.tpl["gallery"], page_vars)
         gallery_html_path = os.path.join(photo_dir, "index.html")
         try:
-            gal_fd = open(gallery_html_path, 'w')
+            gal_fd = open(gallery_html_path, "w")
             gal_fd.write(gallery_html.encode(self.enc))
         except IOError as why:
             self.error("Can't write gallery: %s" % why)
@@ -138,19 +137,19 @@ class PhotoWebber(object):
             gal_fd.close()
 
         # write detail pages
-        if self.tpl.get('detail', False):
+        if self.tpl.get("detail", False):
             for pic in pics:
-                num = pic['num']
+                num = pic["num"]
                 if num > 1:
-                    pic['prev'] = pics[num - 2]['detail_path']
-                if pic['num'] < len(pics):
-                    pic['next'] = pics[num]['detail_path']
-                    pic['next_img'] = pics[num]['img_path']
+                    pic["prev"] = pics[num - 2]["detail_path"]
+                if pic["num"] < len(pics):
+                    pic["next"] = pics[num]["detail_path"]
+                    pic["next_img"] = pics[num]["img_path"]
                 pic.update(md_j)
-                detail_html = pystache.render(self.tpl['detail'], pic)
-                detail_html_path = os.path.join(photo_dir, pic['detail_path'])
+                detail_html = pystache.render(self.tpl["detail"], pic)
+                detail_html_path = os.path.join(photo_dir, pic["detail_path"])
                 try:
-                    detail_fd = open(detail_html_path, 'w')
+                    detail_fd = open(detail_html_path, "w")
                     detail_fd.write(detail_html.encode(self.enc))
                 except IOError as why:
                     self.error("Can't write detail page: %s" % why)
@@ -161,28 +160,28 @@ class PhotoWebber(object):
 
     def create_columns(self, pics, page_vars):
         "Create columns in the pae vars."
-        if self.tpl_md.get('columns', False):
+        if self.tpl_md.get("columns", False):
             pic_rows = []
-            stops = range(0, len(pics), self.tpl_md['columns'])
+            stops = range(0, len(pics), self.tpl_md["columns"])
             last_stop = 0
             for stop in stops[1:]:
-                pic_rows.append({'pics': pics[last_stop:stop]})
+                pic_rows.append({"pics": pics[last_stop:stop]})
                 last_stop = stop
             if len(pics) > last_stop:
-                pic_rows.append({'pics': pics[last_stop:len(pics)]})
+                pic_rows.append({"pics": pics[last_stop : len(pics)]})
             page_vars["pic_rows"] = pic_rows
-            page_vars['columns'] = self.tpl_md['columns']
+            page_vars["columns"] = self.tpl_md["columns"]
 
     def make_thumbnail(self, photo_dir, pic):
         "Make a thumnail."
         thumb_dir = os.path.join(photo_dir, self.thumb_dirname)
         if not os.path.exists(thumb_dir):
             os.mkdir(thumb_dir)
-        img_path = os.path.join(photo_dir, pic['img_path'])
-        thumb_path = os.path.join(thumb_dir, pic['img_path'])
+        img_path = os.path.join(photo_dir, pic["img_path"])
+        thumb_path = os.path.join(thumb_dir, pic["img_path"])
         image = Image.open(img_path)
-        width = self.tpl_md.get('thumbnail_w', 250)
-        height = self.tpl_md.get('thumbnail_h', 250)
+        width = self.tpl_md.get("thumbnail_w", 250)
+        height = self.tpl_md.get("thumbnail_h", 250)
         image.thumbnail((width, height), Image.ANTIALIAS)
         image.save(thumb_path, "JPEG")
         return image.size
@@ -191,19 +190,19 @@ class PhotoWebber(object):
         "Get the pics and sort them"
         pics = self.load_pics(photo_dir)
         pics.sort(self.sort_pics)
-        if md.get('reverse', False): 
+        if md.get("reverse", False):
             pics.reverse()
         for i in range(len(pics)):
-            pics[i]['num'] = i + 1
+            pics[i]["num"] = i + 1
         page_vars = {
-            'pics': pics,
+            "pics": pics,
         }
         return page_vars
-        
+
     @staticmethod
     def sort_pics(pic_a, pic_b):
         "Sort function for pictures, by date."
-        return cmp(pic_a['date'], pic_b['date'])
+        return cmp(pic_a["date"], pic_b["date"])
 
     def load_pics(self, photo_dir):
         "Find the pictures in photo_dir."
@@ -217,15 +216,17 @@ class PhotoWebber(object):
             if md is None:
                 return
             path = os.path.split(phile)[1]
-            pics.append({
-                'img_path': path,
-                'detail_path': "%s.html" % os.path.splitext(path)[0],
-                'title': md.get('Iptc.ObjectName', '').decode('utf-8'),
-                'caption': md.get('Iptc.Caption', '').decode('utf-8'),
-                'date': md.get('Exif.DateTimeOriginal', ''),
-                'w': md.get('Exif.ExifImageWidth', width),
-                'h': md.get('Exif.ExifImageHeight', height),
-            })
+            pics.append(
+                {
+                    "img_path": path,
+                    "detail_path": "%s.html" % os.path.splitext(path)[0],
+                    "title": md.get("Iptc.ObjectName", "").decode("utf-8"),
+                    "caption": md.get("Iptc.Caption", "").decode("utf-8"),
+                    "date": md.get("Exif.DateTimeOriginal", ""),
+                    "w": md.get("Exif.ExifImageWidth", width),
+                    "h": md.get("Exif.ExifImageHeight", height),
+                }
+            )
         return pics
 
     @staticmethod
@@ -233,9 +234,7 @@ class PhotoWebber(object):
         try:
             im = Image.open(phile)
         except IOError as why:
-            sys.stderr.write("Can't find metadata for %s (%s).\n" %
-                (phile, why)
-            )
+            sys.stderr.write("Can't find metadata for %s (%s).\n" % (phile, why))
             return None
         out = {}
         exif_info = im._getexif() or {}
