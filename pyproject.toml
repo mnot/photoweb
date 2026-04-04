@@ -15,7 +15,7 @@ classifiers = [
 ]
 dependencies = [
     "pillow",
-    "pystache"
+    "jinja2"
 ]
 
 [project.optional-dependencies]

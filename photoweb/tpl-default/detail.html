@@ -3,7 +3,7 @@
 <head>
   <title>{{page_title}}</title>
   <link rel="stylesheet" href="/photo/lib/style.css" type="text/css">
-  {{#next_img}}<link rel="prefetch" href="{{next_img}}">{{/next_img}}
+  {% if next_img %}<link rel="prefetch" href="{{next_img}}">{% endif %}
   <meta name="viewport" content="width={{w}},user-scalable=no" />
   <script src="/lib/components/jquery/jquery.min.js"></script>
   <script src="/lib/components/jquery-touchswipe/jquery.touchSwipe.min.js"></script>
@@ -14,13 +14,13 @@
     <h1>{{page_title}}</h1>
     <div class='nav'>
       <a href="index.html" id="up">index</a>
-      {{#prev}}<a href="{{prev}}" id="prev">previous</a>{{/prev}}
-      {{#next}}<a href="{{next}}" id="next">next</a>{{/next}}
+      {% if prev %}<a href="{{prev}}" id="prev">previous</a>{% endif %}
+      {% if next %}<a href="{{next}}" id="next">next</a>{% endif %}
       <a href="/photo/">home</a>
     </div>
     <div class='picmd'>
-      {{#title}}<h2>{{title}}</h2>{{/title}}
-      {{#caption}}<p class="caption">{{caption}}</p>{{/caption}}
+      {% if title %}<h2>{{title}}</h2>{% endif %}
+      {% if caption %}<p class="caption">{{caption}}</p>{% endif %}
     </div>
   </div>
   <div class="wrap">

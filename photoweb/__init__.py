@@ -7,7 +7,7 @@ import sys
 
 from typing import Any, Dict, List, Optional, Tuple
 from PIL import Image, ExifTags, IptcImagePlugin
-import pystache  # type: ignore[import-untyped]
+import jinja2
 
 from .types import PictureData, GalleryMetadata, TemplateMetadata, TemplateData, PageVars, PicRow
 
@@ -130,7 +130,8 @@ class PhotoWebber:
         self.create_columns(pics, page_vars)
 
         # write gallery HTML
-        gallery_html = pystache.render(self.tpl["gallery"], page_vars)
+        gallery_tpl = jinja2.Template(self.tpl["gallery"])
+        gallery_html = gallery_tpl.render(page_vars)
         gallery_html_path = os.path.join(photo_dir, "index.html")
         try:
             with open(gallery_html_path, "w", encoding=self.enc) as gal_fd:
@@ -148,7 +149,8 @@ class PhotoWebber:
                     pic["next"] = pics[num]["detail_path"]
                     pic["next_img"] = pics[num]["img_path"]
                 pic.update(md_j)
-                detail_html = pystache.render(self.tpl["detail"], pic)
+                detail_tpl = jinja2.Template(self.tpl["detail"])
+                detail_html = detail_tpl.render(pic)
                 detail_html_path = os.path.join(photo_dir, pic["detail_path"])
                 try:
                     with open(detail_html_path, "w", encoding=self.enc) as detail_fd:
