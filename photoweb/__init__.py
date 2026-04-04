@@ -5,8 +5,11 @@ import os
 import shutil
 import sys
 
+from typing import Any, Dict, List, Optional, Tuple
 from PIL import Image, ExifTags, IptcImagePlugin
-import pystache
+import pystache  # type: ignore[import-untyped]
+
+from .types import PictureData, GalleryMetadata, TemplateMetadata, TemplateData, PageVars, PicRow
 
 __version__ = "0.4.1"
 
@@ -33,15 +36,18 @@ class PhotoWebber:
         (2, 120): "Caption",
     }
 
-    def __init__(self, options):
+    tpl: TemplateData
+    tpl_md: TemplateMetadata
+
+    def __init__(self, options: Any) -> None:
         self.options = options
         self.tpl, self.tpl_md = self.load_tpl()
 
-    def load_tpl(self):
+    def load_tpl(self) -> Tuple[TemplateData, TemplateMetadata]:
         "Load the templates."
         tpl_name = self.options.template
-        tpl = {}
-        tpl_md = {}
+        tpl: TemplateData = {}
+        tpl_md: TemplateMetadata = {}
         if not os.path.isdir(self.tpl_dir):
             self.create_default_tpl()
         tpl_path = os.path.join(self.tpl_dir, tpl_name)
@@ -71,12 +77,12 @@ class PhotoWebber:
                 self.error(f"Problem loading template metadata: {why}")
         return tpl, tpl_md
 
-    def create_default_tpl(self):
+    def create_default_tpl(self) -> None:
         "Create the default templates."
         default_tpl = os.path.join(os.path.dirname(__file__), "tpl-default")
         shutil.copytree(default_tpl, os.path.join(self.tpl_dir, "default"))
 
-    def write_md(self, photo_dir, md_j):
+    def write_md(self, photo_dir: str, md_j: GalleryMetadata) -> None:
         "Write the gallery metadata."
         md_file = os.path.join(photo_dir, "md.json")
         try:
@@ -85,26 +91,25 @@ class PhotoWebber:
         except IOError as why:
             self.error(f"Couldn't write metatadata: {why}")
 
-    def read_md(self, photo_dir):
+    def read_md(self, photo_dir: str) -> GalleryMetadata:
         "Read the gallery metadata."
         md_file = os.path.join(photo_dir, "md.json")
         try:
             with open(md_file, "r", encoding=self.enc) as md_fd:
-                md_j = json.load(md_fd)
+                md_j: GalleryMetadata = json.load(md_fd)
         except (IOError, ValueError):
             md_j = {}
-        # update with command-line options, if any
         if self.options.page_title:
-            md_j["page_title"] = self.options.page_title.decode(self.enc)
+            md_j["page_title"] = self.options.page_title
         if self.options.page_desc:
             md_j["page_desc"] = [
-                {"p": d.decode(self.enc)} for d in self.options.page_desc
+                {"p": d} for d in self.options.page_desc
             ]
         if self.options.reverse:
             md_j["reverse"] = True
         return md_j
 
-    def run(self, photo_dir):
+    def run(self, photo_dir: str) -> None:
         "Process the photos in photo_dir."
         if not os.path.isdir(photo_dir):
             self.error(f"Can't find {photo_dir}")
@@ -152,10 +157,10 @@ class PhotoWebber:
 
         self.write_md(photo_dir, md_j)
 
-    def create_columns(self, pics, page_vars):
+    def create_columns(self, pics: List[PictureData], page_vars: PageVars) -> None:
         "Create columns in the pae vars."
         if self.tpl_md.get("columns", False):
-            pic_rows = []
+            pic_rows: List[PicRow] = []
             stops = range(0, len(pics), self.tpl_md["columns"])
             last_stop = 0
             for stop in stops[1:]:
@@ -166,7 +171,7 @@ class PhotoWebber:
             page_vars["pic_rows"] = pic_rows
             page_vars["columns"] = self.tpl_md["columns"]
 
-    def make_thumbnail(self, photo_dir, pic):
+    def make_thumbnail(self, photo_dir: str, pic: PictureData) -> Tuple[int, int]:
         "Make a thumnail."
         thumb_dir = os.path.join(photo_dir, self.thumb_dirname)
         if not os.path.exists(thumb_dir):
@@ -180,7 +185,7 @@ class PhotoWebber:
         image.save(thumb_path, "JPEG")
         return image.size
 
-    def get_sorted_pics(self, photo_dir, md):
+    def get_sorted_pics(self, photo_dir: str, md: GalleryMetadata) -> PageVars:
         "Get the pics and sort them"
         pics = self.load_pics(photo_dir)
         pics.sort(key=lambda x: x["date"])
@@ -188,20 +193,20 @@ class PhotoWebber:
             pics.reverse()
         for i, pic in enumerate(pics):
             pic["num"] = i + 1
-        page_vars = {
+        page_vars: PageVars = {
             "pics": pics,
         }
         return page_vars
 
     @staticmethod
-    def sort_pics(pic_a, pic_b):
+    def sort_pics(pic_a: PictureData, pic_b: PictureData) -> int:
         "Sort function for pictures, by date."
-        return (pic_a["date"] > pic_b["date"]) - (pic_a["date"] < pic_b["date"])
+        return int(pic_a["date"] > pic_b["date"]) - int(pic_a["date"] < pic_b["date"])
 
-    def load_pics(self, photo_dir):
+    def load_pics(self, photo_dir: str) -> List[PictureData]:
         "Find the pictures in photo_dir."
         files = os.listdir(photo_dir)
-        pics = []
+        pics: List[PictureData] = []
         for phile in files:
             phile = os.path.join(photo_dir, phile)
             if os.path.splitext(phile)[1].lower() not in self.pic_types:
@@ -224,14 +229,14 @@ class PhotoWebber:
         return pics
 
     @staticmethod
-    def mdget(phile):
+    def mdget(phile: str) -> Tuple[Optional[Dict[str, Any]], Tuple[int, int]]:
         try:
             im = Image.open(phile)
         except IOError as why:
             sys.stderr.write(f"Can't find metadata for {phile} ({why}).\n")
-            return None
-        out = {}
-        exif_info = im.getexif() or {}
+            return None, (0, 0)
+        out: Dict[str, Any] = {}
+        exif_info: Any = im.getexif() or {}
         for tag, value in exif_info.items():
             decoded = ExifTags.TAGS.get(tag, "unknown")
             out["Exif." + decoded] = value
@@ -242,7 +247,7 @@ class PhotoWebber:
         return out, im.size
 
     @staticmethod
-    def error(msg):
+    def error(msg: str) -> None:
         "Something has gone horribly wrong."
         sys.stderr.write(f"FATAL: {msg}\n")
         sys.exit(1)

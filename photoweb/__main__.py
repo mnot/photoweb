@@ -6,7 +6,7 @@ import os
 from . import PhotoWebber, __version__
 
 
-def photoweb_cli():
+def photoweb_cli() -> None:
     "Run command-line photoweb."
     usage = "Usage: %prog [options] <dir>"
     version = f"photoweb version {__version__}"
