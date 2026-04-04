@@ -12,11 +12,11 @@
         <p class="caption">{{desc.p}}</p>
       {% endfor %}
   </div>
-  <table>
+  <div class="gallery">
   {% for row in pic_rows %}
-  <tr>
+  <div class="row">
   {% for pic in row.pics %}
-  <td>
+  <div class="cell">
   <div class='pic' id="{{pic.num}}" style="width: {{pic.th_w}}px">
     <a href="{{pic.detail_path}}">
         <img src='thumbnails/{{pic.img_path}}' width='{{pic.th_w}}' height='{{pic.th_h}}'>
@@ -24,10 +24,10 @@
     <p class="small num">{{pic.num}}</p>
     {% if pic.title %}<h3>{{pic.title}}</h3>{% endif %}
   </div>
-  </td>
+  </div>
   {% endfor %}
-  </tr>
+  </div>
   {% endfor %}
-  </table>
+  </div>
 </body>
 </html>
