@@ -25,6 +25,7 @@ class TemplateManager:
 
     def __init__(self, tpl_name: str) -> None:
         self.tpl_name = tpl_name
+        self.tpl_path: str = ""
         self.tpl, self.tpl_md = self.load_tpl()
 
     def load_tpl(self) -> Tuple[TemplateData, TemplateMetadata]:
@@ -40,6 +41,8 @@ class TemplateManager:
                 tpl_path = self.pkg_tpl_dir
         else:
             tpl_path = os.path.join(self.tpl_dir, self.tpl_name)
+
+        self.tpl_path = tpl_path
 
         if not os.path.isdir(tpl_path):
             raise PhotoWebError(f"Can't find {self.tpl_name} template.")

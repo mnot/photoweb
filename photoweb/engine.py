@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 from typing import Any, List
 
 from .templates import TemplateManager
@@ -36,6 +37,7 @@ class PhotoWebber:
         if not pics:
             raise PhotoWebError(f"No pictures found in {photo_dir}")
 
+        self._copy_assets(photo_dir)
         self._make_thumbnails(photo_dir, gallery)
 
         page_vars: PageVars = {
@@ -91,3 +93,15 @@ class PhotoWebber:
                     detail_fd.write(detail_html)
             except IOError as why:
                 raise PhotoWebError(f"Can't write detail page: {why}") from why
+
+    def _copy_assets(self, photo_dir: str) -> None:
+        "Copy non-template assets from the template directory."
+        tpl_path = self.templates.tpl_path
+        ignore = ["gallery.html", "detail.html", "md.json"]
+        for filename in os.listdir(tpl_path):
+            if filename in ignore or filename.startswith("."):
+                continue
+            src = os.path.join(tpl_path, filename)
+            if os.path.isfile(src):
+                dest = os.path.join(photo_dir, filename)
+                shutil.copy2(src, dest)

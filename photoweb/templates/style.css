@@ -1,0 +1,201 @@
+/* 
+  photoweb default style 
+  A modern, premium look with responsive grid and dark mode support.
+*/
+
+:root {
+  --bg-color: #ffffff;
+  --text-color: #1d1d1f;
+  --secondary-text: #86868b;
+  --accent-color: #0066cc;
+  --border-color: #d2d2d7;
+  --card-bg: #f5f5f7;
+  --overlay-bg: rgba(255, 255, 255, 0.8);
+  --gap: 20px;
+  --transition: all 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #000000;
+    --text-color: #f5f5f7;
+    --secondary-text: #86868b;
+    --accent-color: #2997ff;
+    --border-color: #424245;
+    --card-bg: #1d1d1f;
+    --overlay-bg: rgba(29, 29, 31, 0.8);
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Info Section */
+.info {
+  padding: 80px 20px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.info h1 {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin-bottom: 16px;
+}
+
+.info .caption {
+  font-size: 21px;
+  color: var(--secondary-text);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Gallery Grid */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  max-width: 1400px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+}
+
+tr {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--gap);
+  margin-bottom: var(--gap);
+}
+
+td {
+  display: block;
+}
+
+.pic {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background-color: var(--card-bg);
+  transition: var(--transition);
+}
+
+.pic:hover {
+  transform: scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.pic img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.pic .small.num {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background-color: var(--overlay-bg);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+}
+
+.pic h3 {
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Detail Page */
+.nav {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  font-size: 17px;
+}
+
+.picmd {
+  margin-top: 32px;
+}
+
+.picmd h2 {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.wrap {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.wrap .pic {
+  max-width: 100%;
+  border-radius: 18px;
+}
+
+.wrap .num, .wrap .date {
+  text-align: center;
+  margin-top: 12px;
+  color: var(--secondary-text);
+  font-size: 14px;
+}
+
+/* Navigation Links at bottom */
+.navigation {
+  padding: 60px 20px;
+  text-align: center;
+  border-top: 1px solid var(--border-color);
+  margin-top: 60px;
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.navigation a {
+  color: var(--secondary-text);
+}
+
+.navigation a.hilite {
+  color: var(--text-color);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .info h1 {
+    font-size: 32px;
+  }
+}
