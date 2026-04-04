@@ -25,6 +25,11 @@ document.addEventListener('keydown', function(event) {
             }
         }
     } else if (event.key === 'Escape') {
+        const layout = document.querySelector('.detail-layout');
+        if (layout && layout.classList.contains('is-fullscreen')) {
+            layout.classList.remove('is-fullscreen');
+            return;
+        }
         const up = document.getElementById('up');
         if (up) {
             // return to index
@@ -42,9 +47,10 @@ document.addEventListener('keydown', function(event) {
  */
 document.addEventListener('DOMContentLoaded', function() {
     const pic = document.getElementById('pic');
-    if (pic && pic.parentElement) {
+    const layout = document.querySelector('.detail-layout');
+    if (pic && layout) {
         pic.addEventListener('click', function() {
-            pic.parentElement.classList.toggle('full');
+            layout.classList.toggle('is-fullscreen');
         });
     }
 });

@@ -177,20 +177,52 @@ a:hover {
   transition: var(--transition);
 }
 
-.wrap .pic.full {
-  cursor: zoom-out;
-}
-
-.wrap .pic.full img {
-  max-height: none;
-  width: 100%;
-}
-
 .wrap .num, .wrap .date {
   text-align: center;
   margin-top: 12px;
   color: var(--secondary-text);
   font-size: 14px;
+  transition: var(--transition);
+}
+
+/* Fullscreen Mode */
+.is-fullscreen {
+  overflow: hidden; /* Prevent scrolling site when fullscreen */
+}
+
+.is-fullscreen .info,
+.is-fullscreen .num,
+.is-fullscreen .date {
+  display: none !important;
+}
+
+.is-fullscreen .wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000; /* True black for focus */
+  z-index: 1000;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.is-fullscreen .wrap .pic {
+  max-width: 100vw;
+  max-height: 100vh;
+  border-radius: 0;
+  cursor: zoom-out;
+}
+
+.is-fullscreen .wrap .pic img {
+  max-width: 100vw;
+  max-height: 100vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }
 
 /* Responsive Detail Layout */
