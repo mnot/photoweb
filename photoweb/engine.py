@@ -76,7 +76,9 @@ class PhotoWebber:
         except IOError as why:
             raise PhotoWebError(f"Can't write gallery: {why}") from why
 
-    def _write_details(self, photo_dir: str, pics: List[PictureData], md: GalleryMetadata) -> None:
+    def _write_details(
+        self, photo_dir: str, pics: List[PictureData], md: GalleryMetadata
+    ) -> None:
         if "detail" not in self.templates.tpl:
             return
         for i, pic_data in enumerate(pics):

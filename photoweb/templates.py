@@ -72,11 +72,15 @@ class TemplateManager:
                 with open(tpl_md_path, "r", encoding=self.enc) as tpl_md_fd:
                     tpl_md = json.load(tpl_md_fd)
             except (IOError, ValueError) as why:
-                raise PhotoWebError(f"Problem loading template metadata: {why}") from why
+                raise PhotoWebError(
+                    f"Problem loading template metadata: {why}"
+                ) from why
 
         return tpl, tpl_md
 
-    def render(self, tpl_type: Literal["gallery", "detail"], data: Mapping[str, Any]) -> str:
+    def render(
+        self, tpl_type: Literal["gallery", "detail"], data: Mapping[str, Any]
+    ) -> str:
         "Render a template with data."
         if tpl_type not in self.tpl:
             raise PhotoWebError(f"Template type {tpl_type} not found.")
