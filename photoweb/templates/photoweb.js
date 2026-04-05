@@ -52,6 +52,19 @@ document.addEventListener('DOMContentLoaded', function() {
         pic.addEventListener('click', function() {
             layout.classList.toggle('is-fullscreen');
         });
+
+        // Lock in dimensions for Safari & CSP compliance
+        const container = pic.parentElement;
+        if (container && container.dataset.w && container.dataset.h) {
+            const w = container.dataset.w;
+            const h = container.dataset.h;
+            // Apply ratio to the image so it doesn't clip the parent
+            pic.style.aspectRatio = `${w} / ${h}`;
+            pic.style.width = '100%';
+            pic.style.height = 'auto';
+            // Apply width to the container to reserve the horizontal space
+            container.style.width = `min(95vw, calc(80vh * ${w} / ${h}))`;
+        }
     }
 });
 
