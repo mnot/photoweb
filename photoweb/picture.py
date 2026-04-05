@@ -117,18 +117,33 @@ class Picture:
             if not any(stem.upper().startswith(p) for p in ignore_prefixes):
                 title = stem
 
+        # Get caption with fallback
+        caption = ""
+        caption_sources = [
+            "Iptc.Caption",
+            "Exif.ImageDescription",
+            "Xmp.dc:description",
+            "Exif.UserComment",
+        ]
+        for source in caption_sources:
+            caption = self._get_val(source)
+            if caption:
+                break
+
         self.data = {
             "img_path": self.filename,
             "detail_path": f"{os.path.splitext(self.filename)[0]}.html",
             "title": title.strip(),
-            "caption": self._get_val("Iptc.Caption"),
+            "caption": caption.strip(),
             "date": formatted_date,
             "w": self.width,
             "h": self.height,
         }
         return self.data
 
-    def make_thumbnail(self, thumb_dir: str, tpl_md: TemplateMetadata) -> Tuple[int, int]:
+    def make_thumbnail(
+        self, thumb_dir: str, tpl_md: TemplateMetadata
+    ) -> Tuple[int, int]:
         "Make a thumbnail."
         thumb_path = os.path.join(thumb_dir, self.filename)
         with Image.open(self.photo_path) as im:
