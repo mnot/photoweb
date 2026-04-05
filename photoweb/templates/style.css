@@ -12,7 +12,8 @@
   --card-bg: #f5f5f7;
   --overlay-bg: rgba(255, 255, 255, 0.8);
   --gap: 20px;
-  --transition: all 0.3s ease;
+  --transition-speed: 0.3s;
+  --transition-ease: ease;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -44,7 +45,7 @@ body {
 a {
   color: var(--accent-color);
   text-decoration: none;
-  transition: var(--transition);
+  transition: color var(--transition-speed) var(--transition-ease);
 }
 
 a:hover {
@@ -100,7 +101,8 @@ a:hover {
   overflow: hidden;
   border-radius: 12px;
   background-color: var(--card-bg);
-  transition: var(--transition);
+  transition: transform var(--transition-speed) var(--transition-ease), 
+              box-shadow var(--transition-speed) var(--transition-ease);
   width: fit-content;
   max-width: 100%;
   margin: 0 auto;
@@ -165,16 +167,18 @@ a:hover {
 .wrap .pic {
   max-width: 95vw;
   border-radius: 18px;
-  transition: var(--transition);
+  transition: transform var(--transition-speed) var(--transition-ease),
+              box-shadow var(--transition-speed) var(--transition-ease);
   cursor: zoom-in;
 }
 
 .wrap .pic img {
   max-height: 80vh;
   width: auto;
+  height: auto;
   max-width: 100%;
   object-fit: contain;
-  transition: var(--transition);
+  transition: opacity var(--transition-speed) var(--transition-ease);
 }
 
 .wrap .num, .wrap .date {
@@ -182,7 +186,7 @@ a:hover {
   margin-top: 12px;
   color: var(--secondary-text);
   font-size: 14px;
-  transition: var(--transition);
+  transition: color var(--transition-speed) var(--transition-ease);
 }
 
 /* Fullscreen Mode */
