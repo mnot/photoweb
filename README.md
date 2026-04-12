@@ -6,6 +6,10 @@ templates. What's different about it?
 * It's easy to add new photos; just drop them in the folder and re-run.
 * You don't have to track metadata; it comes from the photos themselves, using
   standard embedded metadata (EXIF, IPTC, XMP).
+* **Automatic Optimization**: It can optimize your images for the web, stripping
+  unnecessary metadata and using perceptual quality search to minimize file size.
+* **Smart Orientation**: Automatically handles photo orientation (fixing rotated 
+  images from phones/cameras).
 * It includes specialized support for titles and descriptions from Apple Photos.
 * It's easy to modify the templates to make your photos look great.
 * It supports modern web features like dark mode, keyboard navigation, and 
@@ -37,7 +41,24 @@ description, which will be used in the template:
 > photoweb -p "At the Beach" -d "We went to the beach for a weekend. Fun!" . 
 
 The page metadata will be saved in a file (md.json) for use next time you
-run photoweb. 
+run photoweb.
+
+
+### Optimizing Images
+
+You can optimize your original images in place and strip their metadata, which
+is recommended if you are going to host the files on a server:
+
+> photoweb -o .
+
+By default, this uses a [perceptual algorithm](https://en.wikipedia.org/wiki/Structural_similarity)
+to find the best quality setting for each image. This can be slow; to optimize 
+more quickly without perceptual search:
+
+> photoweb -o -f .
+
+Optimization will also strip all metadata from the images for privacy and 
+file size reduction.
 
 
 ## Creating and Using Templates
