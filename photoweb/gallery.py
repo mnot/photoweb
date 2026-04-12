@@ -1,10 +1,10 @@
 import json
 import os
-from typing import List, Any
+from typing import Any, List
 
-from .types import GalleryMetadata, PictureData, PicRow
-from .picture import Picture
 from .exceptions import PhotoWebError
+from .picture import Picture
+from .types import GalleryMetadata, PicRow, PictureData
 
 
 class Gallery:

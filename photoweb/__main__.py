@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-from optparse import OptionParser
 import os
 import sys
+from optparse import OptionParser
 
-from . import PhotoWebber, __version__, PhotoWebError
+from . import PhotoWebber, PhotoWebError, __version__
 
 
 def photoweb_cli() -> None:

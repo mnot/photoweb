@@ -1,12 +1,12 @@
 import json
 import os
 import shutil
-from typing import Tuple, Literal, Mapping, Any
+from typing import Any, Literal, Mapping, Tuple
 
 import jinja2
 
-from .types import TemplateMetadata, TemplateData
 from .exceptions import PhotoWebError
+from .types import TemplateData, TemplateMetadata
 
 
 class TemplateManager:
