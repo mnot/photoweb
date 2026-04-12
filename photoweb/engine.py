@@ -1,12 +1,12 @@
 import os
-import sys
 import shutil
+import sys
 from typing import Any, List
 
-from .templates import TemplateManager
-from .gallery import Gallery
 from .exceptions import PhotoWebError
-from .types import PageVars, PictureData, GalleryMetadata
+from .gallery import Gallery
+from .templates import TemplateManager
+from .types import GalleryMetadata, PageVars, PictureData
 
 
 class PhotoWebber:
@@ -36,6 +36,17 @@ class PhotoWebber:
         pics = gallery.load_pictures()
         if not pics:
             raise PhotoWebError(f"No pictures found in {photo_dir}")
+
+        optimize = getattr(self.options, "optimize", False)
+        fast = getattr(self.options, "fast", False)
+        if optimize:
+            perceptual = not fast
+            sys.stdout.write("Optimizing images")
+            if perceptual:
+                sys.stdout.write(" (perceptual)")
+            sys.stdout.write("...\n")
+            for pic in gallery.pictures:
+                pic.optimize_inplace(perceptual=perceptual)
 
         self._copy_assets(photo_dir)
         self._make_thumbnails(photo_dir, gallery)

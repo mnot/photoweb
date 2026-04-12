@@ -38,6 +38,20 @@ def photoweb_cli() -> None:
         dest="copy_templates",
         help="Copy the default templates to ~/.photoweb/tpl/default",
     )
+    option_parser.add_option(
+        "-o",
+        "--optimize",
+        action="store_true",
+        dest="optimize",
+        help="Optimize images in place (perceptual, strips metadata)",
+    )
+    option_parser.add_option(
+        "-f",
+        "--fast",
+        action="store_true",
+        dest="fast",
+        help="Use fast optimization instead of perceptual (implies --optimize)",
+    )
     options, args = option_parser.parse_args()
     if len(args) < 1 and not options.copy_templates:
         option_parser.error("Please specify at least one directory.")

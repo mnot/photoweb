@@ -1,8 +1,13 @@
 import os
+import io
 from datetime import datetime
-from typing import Optional, Tuple, Dict, Any
+from typing import Any, Dict, Optional, Tuple
 
-from PIL import Image, ExifTags, IptcImagePlugin, ImageOps
+import numpy as np
+from skimage.metrics import (  # pylint: disable=no-name-in-module
+    structural_similarity as ssim,
+)
+from PIL import ExifTags, Image, ImageOps, IptcImagePlugin
 
 from .types import PictureData, TemplateMetadata
 
@@ -151,5 +156,36 @@ class Picture:
             width = tpl_md.get("thumbnail_w", 250)
             height = tpl_md.get("thumbnail_h", 250)
             image.thumbnail((width, height), Image.Resampling.LANCZOS)
-            image.save(thumb_path, "JPEG")
+            image.save(thumb_path, "JPEG", quality=85, optimize=True)
             return image.size
+
+    def optimize_inplace(self, perceptual: bool = False) -> None:
+        "Optimize the original photo in place and strip metadata."
+        with Image.open(self.photo_path) as im:
+            image = ImageOps.exif_transpose(im)
+            if perceptual:
+                quality = self._find_best_quality(image)
+            else:
+                quality = 85
+            image.save(self.photo_path, "JPEG", quality=quality, optimize=True)
+
+    def _find_best_quality(self, im: Image.Image, target_ssim: float = 0.98) -> int:
+        "Find the best JPEG quality to achieve at least target_ssim."
+        im_rgb = im.convert("RGB")
+        arr_orig = np.array(im_rgb)
+        best_q = 95
+        for quality in range(95, 10, -5):
+            with io.BytesIO() as buf:
+                im_rgb.save(buf, "JPEG", quality=quality, optimize=True)
+                buf.seek(0)
+                with Image.open(buf) as im_comp:
+                    arr_comp = np.array(im_comp)
+                    # For color images, we need to specify channel_axis
+                    score = ssim(
+                        arr_orig, arr_comp, channel_axis=2, data_range=255
+                    )  # type: ignore[no-untyped-call]
+                    if score >= target_ssim:
+                        best_q = quality
+                    else:
+                        break
+        return best_q

@@ -17,7 +17,9 @@ classifiers = [
 dependencies = [
     "pillow",
     "jinja2",
-    "defusedxml"
+    "defusedxml",
+    "scikit-image",
+    "numpy"
 ]
 
 [project.optional-dependencies]
