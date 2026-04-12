@@ -6,8 +6,8 @@ from typing import Any, Dict, Optional, Tuple
 import numpy as np
 from PIL import ExifTags, Image, ImageOps, IptcImagePlugin
 from skimage.metrics import (
-    structural_similarity as ssim,
-)  # pylint: disable=no-name-in-module
+    structural_similarity as ssim,  # pylint: disable=no-name-in-module
+)
 
 from .types import PictureData, TemplateMetadata
 

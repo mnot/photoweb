@@ -94,3 +94,6 @@ min-public-methods=1
 
 [tool.pylint.similarities]
 min-similarity-lines = 10
+
+[tool.isort]
+profile = "black"
