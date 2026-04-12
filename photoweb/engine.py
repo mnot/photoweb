@@ -1,7 +1,7 @@
 import os
 import shutil
 import sys
-from typing import Any, List
+from typing import Any, List, cast
 
 from .exceptions import PhotoWebError
 from .gallery import Gallery
@@ -51,10 +51,13 @@ class PhotoWebber:
         self._copy_assets(photo_dir)
         self._make_thumbnails(photo_dir, gallery)
 
-        page_vars: PageVars = {
-            "pics": pics,
-            **gallery.md,
-        }
+        page_vars = cast(
+            PageVars,
+            {
+                "pics": pics,
+                **gallery.md,
+            },
+        )
 
         # handle columns
         columns = self.templates.tpl_md.get("columns", 0)
@@ -98,8 +101,8 @@ class PhotoWebber:
             if pic_data["num"] < len(pics):
                 pic_data["next"] = pics[i + 1]["detail_path"]
                 pic_data["next_img"] = pics[i + 1]["img_path"]
-            pic_data.update(md)
-            detail_html = self.templates.render("detail", pic_data)
+            render_context = {**pic_data, **md}
+            detail_html = self.templates.render("detail", render_context)
             detail_path = os.path.join(photo_dir, pic_data["detail_path"])
             try:
                 with open(detail_path, "w", encoding=self.enc) as detail_fd:
