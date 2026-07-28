@@ -84,7 +84,7 @@ class TemplateManager:
         "Render a template with data."
         if tpl_type not in self.tpl:
             raise PhotoWebError(f"Template type {tpl_type} not found.")
-        tpl = jinja2.Template(self.tpl[tpl_type])
+        tpl: jinja2.Template = jinja2.Template(self.tpl[tpl_type])
         return tpl.render(data)
 
     def create_default_tpl(self) -> str:
